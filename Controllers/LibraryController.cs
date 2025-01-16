@@ -23,9 +23,24 @@ public class LibraryController : ControllerBase
      //Method to get all the Books 
      [HttpGet("viewBooks")]
      [Authorize]
-     public ActionResult<IEnumerable<Book>> ViewBooks()
+     public ActionResult<IEnumerable<Book>> ViewBooks(int pageNumber = 1, int pageSize = 10)
      {
-          return Ok(_context.Books.ToList());
+          if (pageNumber <= 0 || pageSize <= 0)
+          {
+               return BadRequest("Page number and page size must be greater than zero.");
+          }
+
+          // Calculate the number of books to skip
+          int skip = (pageNumber - 1) * pageSize;
+
+          // Fetch the paginated list of books
+          var paginatedBooks = _context.Books
+                                       .Skip(skip)
+                                       .Take(pageSize)
+                                       .ToList();
+
+          // Return the paginated list of books
+          return Ok(paginatedBooks);
      }
 
      //Method to borrow a book with BookId
@@ -68,20 +83,30 @@ public class LibraryController : ControllerBase
      }
 
      //Method to add New Book - Admin
-     [HttpPost("addBook")]
-     [Authorize(Roles = "Admin")]
-     public ActionResult AddBook([FromBody] Book newBook)
-     {
-          var userRole = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
-          if (userRole != "Admin")
-          {
-               return Unauthorized("User is not an admin.");
-          }
+     [HttpPost("addBook/{title}/{author}/{numberOfCopies}")]
+[Authorize(Roles = "Admin")]
+public ActionResult AddBook(string title, string author, int numberOfCopies)
+{
+    // Validate numberOfCopies
+    if (numberOfCopies <= 0)
+    {
+        return BadRequest("Number of copies must be greater than zero.");
+    }
 
-          _context.Books.Add(newBook);
-          _context.SaveChanges();
-          return Ok("Book added successfully.");
-     }
+    // Create a new book instance
+    var newBook = new Book
+    {
+        Title = title,
+        Author = author,
+        CopiesAvailable = numberOfCopies
+    };
+
+    // Add the book to the database
+    _context.Books.Add(newBook);
+    _context.SaveChanges();
+
+    return Ok("Book added successfully.");
+}
 
      //Method to remove a Book - Admin 
      [HttpDelete("removeBook/{id}")]
