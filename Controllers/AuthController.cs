@@ -82,7 +82,7 @@ public class AuthController : ControllerBase
 
             return Ok(new { Token = tokenString });
         }
-        catch (Exception exception )
+        catch (Exception exception)
         {
             return StatusCode(500, $"An unexpected error occurred. {exception}.");
         }

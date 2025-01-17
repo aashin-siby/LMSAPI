@@ -84,29 +84,29 @@ public class LibraryController : ControllerBase
 
      //Method to add New Book - Admin
      [HttpPost("addBook/{title}/{author}/{numberOfCopies}")]
-[Authorize(Roles = "Admin")]
-public ActionResult AddBook(string title, string author, int numberOfCopies)
-{
-    // Validate numberOfCopies
-    if (numberOfCopies <= 0)
-    {
-        return BadRequest("Number of copies must be greater than zero.");
-    }
+     [Authorize(Roles = "Admin")]
+     public ActionResult AddBook(string title, string author, int numberOfCopies)
+     {
+          // Validate numberOfCopies
+          if (numberOfCopies <= 0)
+          {
+               return BadRequest("Number of copies must be greater than zero.");
+          }
 
-    // Create a new book instance
-    var newBook = new Book
-    {
-        Title = title,
-        Author = author,
-        CopiesAvailable = numberOfCopies
-    };
+          // Create a new book instance
+          var newBook = new Book
+          {
+               Title = title,
+               Author = author,
+               CopiesAvailable = numberOfCopies
+          };
 
-    // Add the book to the database
-    _context.Books.Add(newBook);
-    _context.SaveChanges();
+          // Add the book to the database
+          _context.Books.Add(newBook);
+          _context.SaveChanges();
 
-    return Ok("Book added successfully.");
-}
+          return Ok("Book added successfully.");
+     }
 
      //Method to remove a Book - Admin 
      [HttpDelete("removeBook/{id}")]
