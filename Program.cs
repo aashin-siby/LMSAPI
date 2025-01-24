@@ -1,7 +1,7 @@
 /* Title : Library Management System API
 Author: Aashin Siby
 Created at : 14/01/2025
-Updated at : 
+Updated at : 24/01/2025
 Reviewed by : Sabapathi Shanmugham
 Reviewed at : 16/01/2025*/
 
@@ -11,6 +11,9 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using System.Text;
 using LMSAPI.Data;
+using LMSAPI.Repository.IRepository;
+using LMSAPI.Repository;
+using LMSAPI.Utilities;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -74,6 +77,11 @@ builder.Services.AddSwaggerGen(c =>
         }
     });
 });
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IBorrowRepository, BorrowRepository>();
+
+builder.Services.AddAutoMapper(typeof(MappingProfile));
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())

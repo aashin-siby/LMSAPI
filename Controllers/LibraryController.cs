@@ -4,6 +4,9 @@ using Microsoft.AspNetCore.Mvc;
 using LMSAPI.Data;
 using System.Linq;
 using System.Security.Claims;
+using LMSAPI.DTO;
+using LMSAPI.Repository.IRepository;
+using AutoMapper;
 
 namespace LMSAPI.Controllers;
 
@@ -14,10 +17,14 @@ public class LibraryController : ControllerBase
 {
 
      private readonly LibraryDbContext _context;
+     private readonly IBorrowRepository _borrowRepository;
+     private readonly IMapper _mapper;
 
-     public LibraryController(LibraryDbContext context)
+     public LibraryController(LibraryDbContext context, IBorrowRepository borrowRepository, IMapper mapper)
      {
           _context = context;
+          _borrowRepository = borrowRepository;
+          _mapper = mapper;
      }
 
      //Method to get all the Books 
@@ -29,26 +36,21 @@ public class LibraryController : ControllerBase
           {
                return BadRequest("Page number and page size must be greater than zero.");
           }
-
-          // Calculate the number of books to skip
           int skip = (pageNumber - 1) * pageSize;
-
-          // Fetch the paginated list of books
           var paginatedBooks = _context.Books
                                        .Skip(skip)
                                        .Take(pageSize)
                                        .ToList();
 
-          // Return the paginated list of books
           return Ok(paginatedBooks);
      }
 
      //Method to borrow a book with BookId
      [HttpPost("borrowBook/{id}")]
      [Authorize]
-     public ActionResult BorrowBook(int id)
+     public async Task<IActionResult> BorrowBook([FromBody] BorrowBookDto borrowBookDto)
      {
-          var book = _context.Books.FirstOrDefault(b => b.BookId == id);
+          var book = _context.Books.FirstOrDefault(b => b.BookId == borrowBookDto.BookId);
           if (book == null || book.CopiesAvailable <= 0)
                return BadRequest("Book not available.");
 
@@ -59,27 +61,40 @@ public class LibraryController : ControllerBase
           book.CopiesAvailable--;
           _context.SaveChanges();
 
+          var borrowDetails = new BorrowDetails
+          {
+               UserId = int.Parse(userId),
+               BookId = book.BookId,
+               BorrowDate = borrowBookDto.BorrowDate
+          };
+
+          await _borrowRepository.BorrowBookAsync(borrowDetails);
+
           return Ok("Book borrowed successfully.");
      }
-
+     // add date of return, and borrow
      //Method to return the borrowed book with BookId
      [HttpPost("returnBook/{id}")]
      [Authorize]
-     public ActionResult ReturnBook(int id)
+     public async Task<IActionResult> ReturnBook([FromBody] ReturnBookDto returnBookDto)
      {
-          var userId = User.Claims.FirstOrDefault(c => c.Type == "userId")?.Value;
-          if (userId == null)
-               return Unauthorized();
-
-          var book = _context.Books.FirstOrDefault(b => b.BookId == id);
-          if (book != null)
+          try
           {
-               book.CopiesAvailable++;
-               _context.SaveChanges();
-               return Ok("Book returned successfully.");
-          }
+               var borrowDetails = await _borrowRepository.ReturnBookAsync(returnBookDto.BorrowId, returnBookDto.ReturnDate);
 
-          return BadRequest("Book not found.");
+               var book = _context.Books.FirstOrDefault(b => b.BookId == borrowDetails.BookId);
+               if (book != null)
+               {
+                    book.CopiesAvailable++;
+                    _context.SaveChanges();
+               }
+
+               return Ok(new { Message = "Book returned successfully!", Penalty = borrowDetails.Penalty });
+          }
+          catch (Exception ex)
+          {
+               return BadRequest(ex.Message);
+          }
      }
 
      //Method to add New Book - Admin
@@ -87,13 +102,11 @@ public class LibraryController : ControllerBase
      [Authorize(Roles = "Admin")]
      public ActionResult AddBook(string title, string author, int numberOfCopies)
      {
-          // Validate numberOfCopies
           if (numberOfCopies <= 0)
           {
                return BadRequest("Number of copies must be greater than zero.");
           }
 
-          // Create a new book instance
           var newBook = new Book
           {
                Title = title,
@@ -101,7 +114,6 @@ public class LibraryController : ControllerBase
                CopiesAvailable = numberOfCopies
           };
 
-          // Add the book to the database
           _context.Books.Add(newBook);
           _context.SaveChanges();
 

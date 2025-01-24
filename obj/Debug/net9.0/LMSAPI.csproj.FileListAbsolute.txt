@@ -158,3 +158,5 @@ D:\Dotnet\LMSAPI\bin\Debug\net9.0\runtimes\win\lib\net6.0\System.Runtime.Caching
 D:\Dotnet\LMSAPI\bin\Debug\net9.0\runtimes\win\lib\net6.0\System.Security.Cryptography.ProtectedData.dll
 D:\Dotnet\LMSAPI\bin\Debug\net9.0\runtimes\win\lib\net6.0\System.Windows.Extensions.dll
 D:\Dotnet\LMSAPI\obj\Debug\net9.0\LMSAPI.sourcelink.json
+D:\Dotnet\LMSAPI\bin\Debug\net9.0\AutoMapper.dll
+D:\Dotnet\LMSAPI\bin\Debug\net9.0\AutoMapper.Extensions.Microsoft.DependencyInjection.dll

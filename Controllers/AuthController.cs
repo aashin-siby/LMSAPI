@@ -9,6 +9,9 @@ using System.Text;
 using BCrypt.Net;
 using Microsoft.EntityFrameworkCore;
 using LMSAPI.exceptions;
+using LMSAPI.Repository.IRepository;
+using LMSAPI.DTO;
+using AutoMapper;
 namespace LMSAPI.Controllers;
 
 //Controller which control authentication and authorization 
@@ -16,32 +19,34 @@ namespace LMSAPI.Controllers;
 [Route("api/[controller]")]
 public class AuthController : ControllerBase
 {
-    private readonly LibraryDbContext _context;
+    private readonly IUserRepository _userRepository;
     private readonly IConfiguration _configuration;
+    private readonly IMapper _mapper;
 
-    public AuthController(LibraryDbContext context, IConfiguration configuration)
+    public AuthController(IUserRepository userRepository, IConfiguration configuration, IMapper mapper)
     {
-        _context = context;
+        _mapper = mapper;
+        _userRepository = userRepository;
         _configuration = configuration;
     }
 
     //Method to Register a new user
     [HttpPost("register")]
-    public IActionResult Register(User user)
+    public async Task<IActionResult> Register([FromBody] UserDto userDto)
     {
         try
         {
-            var hashedPassword = BCrypt.Net.BCrypt.HashPassword(user.Password);
+            var hashedPassword = BCrypt.Net.BCrypt.HashPassword(userDto.Password);
+            var user = _mapper.Map<User>(userDto);
             user.Password = hashedPassword;
 
-            _context.Users.Add(user);
-            _context.SaveChanges();
+            await _userRepository.AddUserAsync(user);
 
             return Ok("User registered successfully!");
         }
-        catch (DbUpdateException dbexception)
+        catch (DbUpdateException dbException)
         {
-            return StatusCode(500, $"An error occurred while registering the user. {dbexception}");
+            return StatusCode(500, $"An error occurred while registering the user. {dbException}");
         }
         catch (Exception exception)
         {
@@ -51,12 +56,12 @@ public class AuthController : ControllerBase
 
     //Method to login and generate a JWT token
     [HttpPost("login")]
-    public IActionResult Login([FromBody] User login)
+    public async Task<IActionResult> Login([FromBody] UserDto userDto)
     {
         try
         {
-            var user = _context.Users.SingleOrDefault(u => u.Username == login.Username);
-            if (user == null || !BCrypt.Net.BCrypt.Verify(login.Password, user.Password))
+            var user = await _userRepository.GetUserByUsernameAsync(userDto.Username);
+            if (user == null || !BCrypt.Net.BCrypt.Verify(userDto.Password, user.Password))
             {
                 return Unauthorized("Invalid credentials");
             }
@@ -67,10 +72,10 @@ public class AuthController : ControllerBase
             {
                 Subject = new ClaimsIdentity(new[]
                 {
-                new Claim(ClaimTypes.Name, user.Username),
-                new Claim("userId", user.UserId.ToString()),
-                new Claim(ClaimTypes.Role, user.Role)
-            }),
+                        new Claim(ClaimTypes.Name, user.Username),
+                        new Claim("userId", user.UserId.ToString()),
+                        new Claim(ClaimTypes.Role, user.Role.ToString()) // Convert enum to string
+                    }),
                 Expires = DateTime.UtcNow.AddHours(1),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature),
                 Issuer = _configuration["Jwt:Issuer"],
