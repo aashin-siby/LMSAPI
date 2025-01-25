@@ -7,7 +7,7 @@ public static class ModelConstants
 
      public const string UsernamePatter = @"^[a-zA-Z0-9]+$";
      public const string PasswordPattern = @"^[a-zA-Z0-9!@#$%^&*()_+]+$";
-     public const string RolePattern = "^(0|1)$";
+     public const string RolePattern = "^(Admin|User)$";
      public const string AuthorPattern = @"^[\p{L}\s]+$";
      public const string CopiesAvailablePatter = @"^\d+$";
 

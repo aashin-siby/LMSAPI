@@ -32,65 +32,65 @@ public class AuthController : ControllerBase
 
     //Method to Register a new user
     [HttpPost("register")]
-    public async Task<IActionResult> Register([FromBody] UserDto userDto)
-    {
-        try
+    public async Task<IActionResult> Register([FromBody] UserRegister userRegister)
         {
-            var hashedPassword = BCrypt.Net.BCrypt.HashPassword(userDto.Password);
-            var user = _mapper.Map<User>(userDto);
-            user.Password = hashedPassword;
+            try
+            {
+                var hashedPassword = BCrypt.Net.BCrypt.HashPassword(userRegister.Password);
+                var user = _mapper.Map<User>(userRegister);
+                user.Password = hashedPassword;
 
-            await _userRepository.AddUserAsync(user);
+                await _userRepository.AddUserAsync(user);
 
-            return Ok("User registered successfully!");
+                return Ok("User registered successfully!");
+            }
+            catch (DbUpdateException dbException)
+            {
+                return StatusCode(500, $"An error occurred while registering the user. {dbException}");
+            }
+            catch (Exception exception)
+            {
+                return StatusCode(500, $"An unexpected error occurred. {exception}.");
+            }
         }
-        catch (DbUpdateException dbException)
-        {
-            return StatusCode(500, $"An error occurred while registering the user. {dbException}");
-        }
-        catch (Exception exception)
-        {
-            return StatusCode(500, $"An unexpected error occurred. {exception}.");
-        }
-    }
 
     //Method to login and generate a JWT token
     [HttpPost("login")]
-    public async Task<IActionResult> Login([FromBody] UserDto userDto)
-    {
-        try
+   public async Task<IActionResult> Login([FromBody] UserLogin userLogin)
         {
-            var user = await _userRepository.GetUserByUsernameAsync(userDto.Username);
-            if (user == null || !BCrypt.Net.BCrypt.Verify(userDto.Password, user.Password))
+            try
             {
-                return Unauthorized("Invalid credentials");
-            }
-
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.UTF8.GetBytes(_configuration["Jwt:SecretKey"]);
-            var tokenDescriptor = new SecurityTokenDescriptor
-            {
-                Subject = new ClaimsIdentity(new[]
+                var user = await _userRepository.GetUserByUsernameAsync(userLogin.Username);
+                if (user == null || !BCrypt.Net.BCrypt.Verify(userLogin.Password, user.Password))
                 {
+                    return Unauthorized("Invalid credentials");
+                }
+
+                var tokenHandler = new JwtSecurityTokenHandler();
+                var key = Encoding.UTF8.GetBytes(_configuration["Jwt:SecretKey"]);
+                var tokenDescriptor = new SecurityTokenDescriptor
+                {
+                    Subject = new ClaimsIdentity(new[]
+                    {
                         new Claim(ClaimTypes.Name, user.Username),
                         new Claim("userId", user.UserId.ToString()),
-                        new Claim(ClaimTypes.Role, user.Role.ToString()) // Convert enum to string
+                        // new Claim(ClaimTypes.Role, user.Role)
                     }),
-                Expires = DateTime.UtcNow.AddHours(1),
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature),
-                Issuer = _configuration["Jwt:Issuer"],
-                Audience = _configuration["Jwt:Audience"]
-            };
+                    Expires = DateTime.UtcNow.AddHours(1),
+                    SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature),
+                    Issuer = _configuration["Jwt:Issuer"],
+                    Audience = _configuration["Jwt:Audience"]
+                };
 
-            var token = tokenHandler.CreateToken(tokenDescriptor);
-            var tokenString = tokenHandler.WriteToken(token);
+                var token = tokenHandler.CreateToken(tokenDescriptor);
+                var tokenString = tokenHandler.WriteToken(token);
 
-            return Ok(new { Token = tokenString });
+                return Ok(new { Token = tokenString });
+            }
+            catch (Exception exception)
+            {
+                return StatusCode(500, $"An unexpected error occurred. {exception}.");
+            }
         }
-        catch (Exception exception)
-        {
-            return StatusCode(500, $"An unexpected error occurred. {exception}.");
-        }
-    }
 }
 

@@ -14,6 +14,8 @@ using LMSAPI.Data;
 using LMSAPI.Repository.IRepository;
 using LMSAPI.Repository;
 using LMSAPI.Utilities;
+using LMSAPI.Models;
+using LMSAPI.DTO;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -79,6 +81,8 @@ builder.Services.AddSwaggerGen(c =>
 });
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IBorrowRepository, BorrowRepository>();
+builder.Services.AddTransient<IGenericRepository<BookDto>, BookRepository>();
+
 
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 
