@@ -1,6 +1,6 @@
+
 namespace LMSAPI.Utilities;
-
-
+//Constants that are used in the DTOs for validation 
 public static class ModelConstants
 {
      // Regular Expression Patterns

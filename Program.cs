@@ -1,10 +1,3 @@
-/* Title : Library Management System API
-Author: Aashin Siby
-Created at : 14/01/2025
-Updated at : 24/01/2025
-Reviewed by : Sabapathi Shanmugham
-Reviewed at : 16/01/2025*/
-
 using Microsoft.OpenApi.Models;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -14,20 +7,20 @@ using LMSAPI.Data;
 using LMSAPI.Repository.IRepository;
 using LMSAPI.Repository;
 using LMSAPI.Utilities;
-using LMSAPI.Models;
-using LMSAPI.DTO;
-
+using LMSAPI.Services;
+using LMSAPI.Controllers;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
-//EF core service
+
+// EF core service
 builder.Services.AddDbContext<LibraryDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-//JWT Authentication service.
+
+// JWT Authentication service.
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
-        var configuration = builder.Configuration;
 
         options.TokenValidationParameters = new TokenValidationParameters
         {
@@ -35,11 +28,10 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateAudience = true,
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
-            ValidIssuer = configuration["Jwt:Issuer"],
-            ValidAudience = configuration["Jwt:Audience"],
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:SecretKey"]))
+            ValidIssuer = builder.Configuration["Jwt:Issuer"],
+            ValidAudience = builder.Configuration["Jwt:Audience"],
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:SecretKey"]))
         };
-
     });
 
 // Add Swagger services for API documentation
@@ -79,10 +71,22 @@ builder.Services.AddSwaggerGen(c =>
         }
     });
 });
-builder.Services.AddScoped<IUserRepository, UserRepository>();
-builder.Services.AddScoped<IBorrowRepository, BorrowRepository>();
-builder.Services.AddTransient<IGenericRepository<BookDto>, BookRepository>();
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", builder =>
+    {
+        builder.AllowAnyOrigin()
+               .AllowAnyMethod()
+               .AllowAnyHeader();
+    });
+});
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IBorrowDetailsRepository, BorrowDetailsRepository>();
+builder.Services.AddScoped<IBookRepository, BookRepository>(); 
+builder.Services.AddScoped<AdminBooksController>();
+
+builder.Services.AddScoped<UserBooksService>();
 
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 
@@ -94,7 +98,10 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+app.UseHttpsRedirection(); // Ensure this line is present
+
+app.UseCors("AllowAll");
+
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();

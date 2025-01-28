@@ -1,13 +1,11 @@
 using System.ComponentModel.DataAnnotations;
 using LMSAPI.Utilities;
 
-namespace LMSAPI.Models;
+namespace LMSAPI.DTO;
 
-//Class which define the Book object
-public class Book
+public class BookDto
 {
-     
-     [Key]
+
      public int BookId { get; set; }
 
      [Required]
@@ -20,7 +18,4 @@ public class Book
      [Required]
      [RegularExpression(ModelConstants.CopiesAvailablePatter, ErrorMessage = ModelConstants.CopiesAvailableErrorMessage)]
      public int CopiesAvailable { get; set; }
-
-     public ICollection<BorrowDetails>? BorrowDetails { get; set; }
-
 }

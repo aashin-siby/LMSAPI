@@ -1,5 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-// using LMSAPI.Enums;
 using LMSAPI.Utilities;
 
 namespace LMSAPI.DTO;

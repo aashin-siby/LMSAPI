@@ -1,12 +1,9 @@
 using LMSAPI.Data;
-using LMSAPI.DTO;
 using LMSAPI.Models;
 using LMSAPI.Repository.IRepository;
-using Microsoft.EntityFrameworkCore;
 
 namespace LMSAPI.Repository;
-
-public class BookRepository : IGenericRepository<BookDto>
+public class BookRepository : IBookRepository
 {
      private readonly LibraryDbContext _dbContext;
 
@@ -15,21 +12,24 @@ public class BookRepository : IGenericRepository<BookDto>
           _dbContext = dbContext;
      }
 
-    public async Task<List<BookDto>> GetAll(int page, int pageSize)
+    public IEnumerable<Book> GetAllBooks()
+    {
+        return _dbContext.Books.ToList();
+    }
+     public Book GetBookById(int bookId)
      {
-          return await _dbContext.Set<Book>()
-              .Skip((page - 1) * pageSize)
-              .Take(pageSize)
-              .Select(book => new BookDto
-              {
-                   BookId = book.BookId,
-                   Title = book.Title,
-                   Author = book.Author,
-                   CopiesAvailable = book.CopiesAvailable
-
-              })
-              .ToListAsync();
+          return _dbContext.Books.Find(bookId);
      }
 
-   
+     public void UpdateBook(Book book)
+     {
+          _dbContext.Books.Update(book);
+     }
+
+     public void Save()
+     {
+          _dbContext.SaveChanges();
+     }
+
+
 }

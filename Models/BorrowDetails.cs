@@ -1,24 +1,26 @@
-using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace LMSAPI.Models
+namespace LMSAPI.Models;
+
+public class BorrowDetails
 {
-    public class BorrowDetails
-    {
-        [Key]
-        public int BorrowId { get; set; }
+    [Key]
+    public int BorrowId { get; set; }
 
-        [Required]
-        public int UserId { get; set; }
+    [Required]
+    public int UserId { get; set; }
 
-        [Required]
-        public int BookId { get; set; }
+    [Required]
+    public int BookId { get; set; }
 
-        [Required]
-        public DateTime BorrowDate { get; set; }
+    [Required]
+    [DataType(DataType.Date)]
 
-        public DateTime? ReturnDate { get; set; }
+    public DateTime BorrowDate { get; set; }
+    [DataType(DataType.Date)]
 
-        public decimal Penalty { get; set; } = 0;
-    }
+    public DateTime? ReturnDate { get; set; }
+
+    public decimal Payment { get; set; }
+    public Book? Book { get; set; }
 }
