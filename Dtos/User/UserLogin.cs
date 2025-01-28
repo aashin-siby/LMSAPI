@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using LMSAPI.Utilities;
 
 namespace LMSAPI.DTO;
-
+//Dto to map when user login with User model
 public class UserLogin
 {
      [Required]

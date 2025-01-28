@@ -34,7 +34,6 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
-// Add Swagger services for API documentation
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
@@ -44,7 +43,6 @@ builder.Services.AddSwaggerGen(c =>
         Version = "v1"
     });
 
-    // Add JWT Authentication to Swagger
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         In = ParameterLocation.Header,
@@ -54,8 +52,6 @@ builder.Services.AddSwaggerGen(c =>
         Scheme = "Bearer",
         BearerFormat = "JWT"
     });
-
-    // Add Security Requirement to ensure every endpoint requires the Bearer token
     c.AddSecurityRequirement(new OpenApiSecurityRequirement
     {
         {
@@ -85,7 +81,6 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IBorrowDetailsRepository, BorrowDetailsRepository>();
 builder.Services.AddScoped<IBookRepository, BookRepository>(); 
 builder.Services.AddScoped<AdminBooksController>();
-
 builder.Services.AddScoped<UserBooksService>();
 
 builder.Services.AddAutoMapper(typeof(MappingProfile));
@@ -98,10 +93,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection(); // Ensure this line is present
-
+app.UseHttpsRedirection();
 app.UseCors("AllowAll");
-
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();

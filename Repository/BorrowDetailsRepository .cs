@@ -4,6 +4,7 @@ using LMSAPI.Repository.IRepository;
 using Microsoft.EntityFrameworkCore;
 
 namespace LMSAPI.Repository;
+//Repository to abastract the LibraryDbContext with BorrowDetails
 public class BorrowDetailsRepository : IBorrowDetailsRepository
 {
     private readonly LibraryDbContext _context;

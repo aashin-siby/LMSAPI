@@ -4,6 +4,7 @@ using LMSAPI.Repository.IRepository;
 using Microsoft.EntityFrameworkCore;
 
 namespace LMSAPI.Repository;
+//Repository to abastract the LibraryDbContext with User
 public class UserRepository : IUserRepository
 {
     private readonly LibraryDbContext _context;

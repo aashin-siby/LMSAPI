@@ -62,6 +62,7 @@ namespace LMSAPI.Controllers
             }
         }
 
+        // Method to login an existing user
         [HttpPost("login")]
         public IActionResult Login([FromBody] UserLogin request)
         {
@@ -98,8 +99,6 @@ namespace LMSAPI.Controllers
 
                 _logger.LogInformation("Login successful for username: {Username}", request.Username);
                 var jsonResponse = new { token, success = true, role = user.Role, message = "Login successful!" };
-                var responseString = JsonSerializer.Serialize(jsonResponse);
-                // _logger.LogInformation("Login Response: {Response}", responseString);
                 return Ok(jsonResponse);
             }
             catch (Exception ex)
@@ -109,6 +108,7 @@ namespace LMSAPI.Controllers
             }
         }
 
+        //Method to generate the token while login
         private string GenerateJwtToken(User user)
         {
             try

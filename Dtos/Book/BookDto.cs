@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using LMSAPI.Utilities;
 
 namespace LMSAPI.DTO;
-
+//Book Dto to get all the boos details to display it 
 public class BookDto
 {
 

@@ -4,23 +4,23 @@ using LMSAPI.Models;
 using LMSAPI.Repository.IRepository;
 
 namespace LMSAPI.Services;
+//Service for Library methods that is related to User
 public class UserBooksService
 {
      private readonly IBookRepository _bookRepository;
      private readonly IBorrowDetailsRepository _borrowDetailsRepository;
 
      private readonly IMapper _mapper;
-     // private readonly ILogger _logger;
-     //  ILogger logger,
+
      public UserBooksService(IMapper mapper, IBookRepository bookRepository, IBorrowDetailsRepository borrowDetailsRepository)
      {
-          // _logger = logger;
           _mapper = mapper;
           _bookRepository = bookRepository;
           _borrowDetailsRepository = borrowDetailsRepository;
 
      }
 
+     //Get all the Books
      public IEnumerable<BookDto> GetAllBooks()
      {
           var books = _bookRepository.GetAllBooks();
@@ -32,6 +32,8 @@ public class UserBooksService
                CopiesAvailable = b.CopiesAvailable
           });
      }
+
+     //Mehod to Borrow Book
      public void BorrowBook(BorrowBookDto borrowBookDto)
      {
           var book = _bookRepository.GetBookById(borrowBookDto.BookId);
@@ -54,6 +56,7 @@ public class UserBooksService
           _bookRepository.Save();
      }
 
+     //Method to Return the book borrowed 
      public void ReturnBook(ReturnBookDto returnBookDto)
      {
           var borrowDetails = _borrowDetailsRepository.GetBorrowDetailsByUserIdAndBookId(returnBookDto.UserId, returnBookDto.BookId);
@@ -80,6 +83,7 @@ public class UserBooksService
           _bookRepository.Save();
      }
 
+     //Method to get bill details of the particular user
      public IEnumerable<BorrowDetailsDto> ViewBill(int userId)
      {
           var borrowDetailsList = _borrowDetailsRepository.GetBorrowDetailsByUserId(userId);

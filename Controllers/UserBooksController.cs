@@ -23,6 +23,8 @@ public class UserBooksController : ControllerBase
           _userBooksService = userBooksService;
           _logger = logger;
      }
+
+     //Method to get all the books 
      [HttpGet("books")]
      public IActionResult GetAllBooks()
      {
@@ -30,6 +32,7 @@ public class UserBooksController : ControllerBase
           return Ok(books);
      }
 
+     //Method to borrow the particular book
      [HttpPost("borrow")]
      [Authorize]
      public IActionResult BorrowBook([FromBody] BorrowBookDto borrowBookDto)
@@ -59,6 +62,8 @@ public class UserBooksController : ControllerBase
                return BadRequest("An error occurred while borrowing the book. Please try again later.");
           }
      }
+
+     //Method to return the book which is borrowed
      [HttpPost("return")]
      [Authorize]
      public IActionResult ReturnBook([FromBody] ReturnBookDto returnBookDto)
@@ -89,6 +94,7 @@ public class UserBooksController : ControllerBase
           }
      }
 
+     //Method to view the bill and borrrowed details of the particular logged in user
      [HttpGet("bill")]
      [Authorize]
      public IActionResult ViewBill()

@@ -3,6 +3,7 @@ using LMSAPI.Models;
 using LMSAPI.Repository.IRepository;
 
 namespace LMSAPI.Repository;
+//Repository to abastract the LibraryDbContext with Book
 public class BookRepository : IBookRepository
 {
      private readonly LibraryDbContext _dbContext;
