@@ -15,6 +15,7 @@ public class AdminBooksController : ControllerBase
      private readonly ILogger<AdminBooksController> _logger;
      public AdminBooksController(LibraryDbContext context, ILogger<AdminBooksController> logger)
      {
+
           _context = context;
           _logger = logger;
      }
@@ -25,11 +26,13 @@ public class AdminBooksController : ControllerBase
      {
           if (numberOfCopies <= 0)
           {
+
+               _logger.LogError("Enter a number greater than 0");
                return BadRequest("Number of copies must be greater than zero.");
           }
-
           var newBook = new Book
           {
+
                Title = title,
                Author = author,
                CopiesAvailable = numberOfCopies
@@ -38,34 +41,43 @@ public class AdminBooksController : ControllerBase
           _context.Books.Add(newBook);
           _context.SaveChanges();
 
+          _logger.LogInformation("Admin added the new book succesfully");
           return Ok("Book added successfully.");
      }
 
      //Method to remove a Book - Admin 
-     [HttpDelete("removeBook/{id}")]
+     [HttpDelete("removeBook/{bookId}")]
      [Authorize(Roles = "Admin")]
-     public ActionResult RemoveBook(int id)
+     public ActionResult RemoveBook(int bookId)
      {
-          var book = _context.Books.FirstOrDefault(b => b.BookId == id);
+          var book = _context.Books.FirstOrDefault(b => b.BookId == bookId);
           if (book == null)
-               return NotFound("Book not found.");
+          {
 
+               _logger.LogError("Book with bookId " + bookId + " not found");
+               return NotFound("Book not found.");
+          }
           _context.Books.Remove(book);
           _context.SaveChanges();
+          _logger.LogInformation("Admin removed the " + book.Title + "book succesfully");
           return Ok("Book removed successfully.");
      }
 
      //Method to increase the book copies - Admin
-     [HttpPost("increaseBookCopies/{id}/{count}")]
+     [HttpPost("increaseBookCopies/{bookId}/{count}")]
      [Authorize(Roles = "Admin")]
-     public ActionResult IncreaseBookCopies(int id, int count)
+     public ActionResult IncreaseBookCopies(int bookId, int count)
      {
-          var book = _context.Books.FirstOrDefault(b => b.BookId == id);
+          var book = _context.Books.FirstOrDefault(b => b.BookId == bookId);
           if (book == null)
-               return NotFound("Book not found.");
+          {
 
+               _logger.LogError("Book with bookId " + bookId + " not found");
+               return NotFound("Book not found.");
+          }
           book.CopiesAvailable += count;
           _context.SaveChanges();
+          _logger.LogInformation("Admin added the " + book.Title + "count succesfully");
           return Ok("Book copies increased successfully.");
      }
 }

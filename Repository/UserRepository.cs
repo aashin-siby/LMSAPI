@@ -14,11 +14,13 @@ public class UserRepository : IUserRepository
         _context = context;
     }
 
+    /// Retrieves a user by their username
     public async Task<User> GetUserByUsernameAsync(string username)
     {
         return await _context.Users.SingleOrDefaultAsync(u => u.Username == username);
     }
 
+    /// Adds a new user to the database
     public async Task AddUserAsync(User user)
     {
         await _context.Users.AddAsync(user);

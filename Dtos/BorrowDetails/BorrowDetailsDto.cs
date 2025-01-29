@@ -5,8 +5,11 @@ namespace LMSAPI.DTO;
 public class BorrowDetailsDto
 {
      public int BookId { get; set; }
-
-     [Required]
+     public int BorrowId { get; set; }
      public string? Title { get; set; }
      public decimal Payment { get; set; }
+     [DataType(DataType.Date)]
+     public DateTime BorrowDate { get; set; }
+     [DataType(DataType.Date)]
+     public DateTime? ReturnDate { get; set; }
 }

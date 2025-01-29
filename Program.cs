@@ -1,3 +1,11 @@
+/* Title : Library Management System API
+Author: Aashin Siby
+Created at : 14/01/2025
+Updated at : 29/01/2025
+Reviewed by : Sabapathi Shanmugham
+Reviewed at : 16/01/2025*/
+
+
 using Microsoft.OpenApi.Models;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -79,9 +87,10 @@ builder.Services.AddCors(options =>
 });
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IBorrowDetailsRepository, BorrowDetailsRepository>();
-builder.Services.AddScoped<IBookRepository, BookRepository>(); 
+builder.Services.AddScoped<IBookRepository, BookRepository>();
 builder.Services.AddScoped<AdminBooksController>();
 builder.Services.AddScoped<UserBooksService>();
+builder.Services.AddScoped<IRentalRepository, RentalRepository>();
 
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 

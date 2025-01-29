@@ -10,12 +10,10 @@ public class User
      public int UserId { get; set; }
 
      [Required]
-     [StringLength(50, MinimumLength = 3)]
-     [RegularExpression(ModelConstants.UsernamePatter, ErrorMessage = ModelConstants.UsernameErrorMessage)]
+     [RegularExpression(ModelConstants.UsernamePattern, ErrorMessage = ModelConstants.UsernameErrorMessage)]
      public string Username { get; set; } = string.Empty;
 
      [Required]
-     [StringLength(100, MinimumLength = 6)]
      [RegularExpression(ModelConstants.PasswordPattern, ErrorMessage = ModelConstants.PasswordErrorMessage)]
      public string Password { get; set; } = string.Empty;
 

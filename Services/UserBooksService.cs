@@ -9,18 +9,17 @@ public class UserBooksService
 {
      private readonly IBookRepository _bookRepository;
      private readonly IBorrowDetailsRepository _borrowDetailsRepository;
+     private readonly IRentalRepository _rentalRepository;
 
-     private readonly IMapper _mapper;
-
-     public UserBooksService(IMapper mapper, IBookRepository bookRepository, IBorrowDetailsRepository borrowDetailsRepository)
+     public UserBooksService(IRentalRepository rentalRepository, IBookRepository bookRepository, IBorrowDetailsRepository borrowDetailsRepository)
      {
-          _mapper = mapper;
           _bookRepository = bookRepository;
           _borrowDetailsRepository = borrowDetailsRepository;
+          _rentalRepository = rentalRepository;
 
      }
 
-     //Get all the Books
+     /// Retrieves all books and maps them to BookDto.
      public IEnumerable<BookDto> GetAllBooks()
      {
           var books = _bookRepository.GetAllBooks();
@@ -33,18 +32,22 @@ public class UserBooksService
           });
      }
 
-     //Mehod to Borrow Book
+     /// Allows a user to borrow a book.
      public void BorrowBook(BorrowBookDto borrowBookDto)
      {
           var book = _bookRepository.GetBookById(borrowBookDto.BookId);
+          var bookTitle = _bookRepository.GetBookTitleById(borrowBookDto.BookId);
+
           if (book == null || book.CopiesAvailable < 1)
                throw new Exception("Book not available");
 
           book.CopiesAvailable -= 1;
+
           _bookRepository.UpdateBook(book);
 
           var borrowDetails = new BorrowDetails
           {
+               Title = bookTitle,
                UserId = borrowBookDto.UserId,
                BookId = borrowBookDto.BookId,
                BorrowDate = borrowBookDto.BorrowDate,
@@ -56,10 +59,10 @@ public class UserBooksService
           _bookRepository.Save();
      }
 
-     //Method to Return the book borrowed 
+     /// Allows a user to return a borrowed book.
      public void ReturnBook(ReturnBookDto returnBookDto)
      {
-          var borrowDetails = _borrowDetailsRepository.GetBorrowDetailsByUserIdAndBookId(returnBookDto.UserId, returnBookDto.BookId);
+          var borrowDetails = _borrowDetailsRepository.GetBorrowDetailsByUserIdAndBookId(returnBookDto.UserId, returnBookDto.BorrowId);
           if (borrowDetails == null || borrowDetails.ReturnDate != null)
                throw new Exception("Borrow details not found or book already returned");
 
@@ -74,7 +77,7 @@ public class UserBooksService
                borrowDetails.Payment = 100;
           }
 
-          var book = _bookRepository.GetBookById(returnBookDto.BookId);
+          var book = _bookRepository.GetBookById(borrowDetails.BookId);
           book.CopiesAvailable += 1;
           _bookRepository.UpdateBook(book);
 
@@ -83,11 +86,17 @@ public class UserBooksService
           _bookRepository.Save();
      }
 
-     //Method to get bill details of the particular user
-     public IEnumerable<BorrowDetailsDto> ViewBill(int userId)
+     /// Retrieves all rental details for a specific user
+     public IEnumerable<BorrowDetailsDto> GetUserRentals(int userId)
      {
-          var borrowDetailsList = _borrowDetailsRepository.GetBorrowDetailsByUserId(userId);
-          var bills = borrowDetailsList.Select(b => _mapper.Map<BorrowDetailsDto>(b));
-          return bills;
+          var rentals = _rentalRepository.GetUserRentals(userId);
+          return rentals.Select(r => new BorrowDetailsDto
+          {
+               BorrowId = r.BorrowId,
+               BookId = r.BookId,
+               BorrowDate = r.BorrowDate,
+               ReturnDate = r.ReturnDate,
+               Payment = r.Payment,
+          }).ToList();
      }
 }

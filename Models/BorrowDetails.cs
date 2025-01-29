@@ -4,8 +4,10 @@ namespace LMSAPI.Models;
 //Model to store the the Borrow Date, Return Date and Payment amount 
 public class BorrowDetails
 {
+    
     [Key]
     public int BorrowId { get; set; }
+    public string? Title { get; set; }
 
     [Required]
     public int UserId { get; set; }

@@ -8,8 +8,11 @@ namespace LMSAPI.Data
     {
         public LibraryDbContext(DbContextOptions<LibraryDbContext> options) : base(options) { }
 
+        //User model to db
         public DbSet<User> Users { get; set; }
+        //Book model to db
         public DbSet<Book> Books { get; set; }
+        //BorrowDetails model to db
         public DbSet<BorrowDetails> BorrowDetails { get; set; }
 
     }
