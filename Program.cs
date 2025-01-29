@@ -19,13 +19,15 @@ using LMSAPI.Services;
 using LMSAPI.Controllers;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Adding controllers to the service container.
 builder.Services.AddControllers();
 
-// EF core service
+// Configure EF Core to use SQL Server with connection string from the configuration.
 builder.Services.AddDbContext<LibraryDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// JWT Authentication service.
+// Configuring JWT authentication
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -42,12 +44,13 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
+// Adding Swagger for API documentation and testing.
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo
     {
-        Title = "My API",
+        Title = "LMS",
         Version = "v1"
     });
 
@@ -68,6 +71,7 @@ builder.Services.AddSwaggerGen(c =>
                 Reference = new OpenApiReference
                 {
                     Type = ReferenceType.SecurityScheme,
+                     // The security scheme used for authentication
                     Id = "Bearer"
                 }
             },
@@ -76,6 +80,7 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
+// Configuring CORS policy to allow all origins, methods, and headers.
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", builder =>
@@ -85,6 +90,8 @@ builder.Services.AddCors(options =>
                .AllowAnyHeader();
     });
 });
+
+// Registering the repositories and services as scoped dependencies.
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IBorrowDetailsRepository, BorrowDetailsRepository>();
 builder.Services.AddScoped<IBookRepository, BookRepository>();
@@ -92,19 +99,24 @@ builder.Services.AddScoped<AdminBooksController>();
 builder.Services.AddScoped<UserBooksService>();
 builder.Services.AddScoped<IRentalRepository, RentalRepository>();
 
+// Registering AutoMapper with the mapping profile for DTOs and models.
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 
 var app = builder.Build();
 
+// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
+//Middlewares
 app.UseHttpsRedirection();
 app.UseCors("AllowAll");
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
+
+// Running the application.
 app.Run();
