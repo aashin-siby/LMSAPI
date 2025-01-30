@@ -92,6 +92,7 @@ public class UserBooksService
           var rentals = _rentalRepository.GetUserRentals(userId);
           return rentals.Select(r => new BorrowDetailsDto
           {
+               Title = r.Title,
                BorrowId = r.BorrowId,
                BookId = r.BookId,
                BorrowDate = r.BorrowDate,

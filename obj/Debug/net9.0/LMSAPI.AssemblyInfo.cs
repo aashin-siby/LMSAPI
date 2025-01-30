@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("LMSAPI")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+7af81c4c8f1b1e417172b29f2356f45d304f39b3")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+909af6b104077f2f35b159850a7b0938725a7c24")]
 [assembly: System.Reflection.AssemblyProductAttribute("LMSAPI")]
 [assembly: System.Reflection.AssemblyTitleAttribute("LMSAPI")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
