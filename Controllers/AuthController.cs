@@ -69,7 +69,7 @@ public class AuthController : ControllerBase
             return BadRequest(new
             {
                 success = false,
-                errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage)
+                errors = ModelState.Values.SelectMany(state => state.Errors).Select(error => error.ErrorMessage)
             });
         }
 

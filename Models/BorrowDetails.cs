@@ -4,7 +4,6 @@ namespace LMSAPI.Models;
 //Model to store the the Borrow Date, Return Date and Payment amount 
 public class BorrowDetails
 {
-    
     [Key]
     public int BorrowId { get; set; }
     public string? Title { get; set; }
@@ -17,12 +16,12 @@ public class BorrowDetails
 
     [Required]
     [DataType(DataType.Date)]
-
     public DateTime BorrowDate { get; set; }
+    
     [DataType(DataType.Date)]
-
     public DateTime? ReturnDate { get; set; }
 
     public decimal Payment { get; set; }
     public Book? Book { get; set; }
+    public User? User { get; set; }
 }

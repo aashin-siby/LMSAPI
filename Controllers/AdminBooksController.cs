@@ -1,7 +1,10 @@
+using System.ComponentModel;
 using LMSAPI.Data;
+using LMSAPI.DTO;
 using LMSAPI.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace LMSAPI.Controllers;
 
@@ -20,9 +23,9 @@ public class AdminBooksController : ControllerBase
           _logger = logger;
      }
      //Method to add New Book - Admin
-     [HttpPost("addBook/{title}/{author}/{numberOfCopies}")]
+     [HttpPost("addBook/{title}/{author}/{imageUrl}/{description}/{numberOfCopies}")]
      [Authorize(Roles = "Admin")]
-     public ActionResult AddBook(string title, string author, int numberOfCopies)
+     public ActionResult AddBook(string title, string author, string imageUrl, string description, int numberOfCopies)
      {
           if (numberOfCopies <= 0)
           {
@@ -34,14 +37,16 @@ public class AdminBooksController : ControllerBase
           {
 
                Title = title,
+               ImageUrl = imageUrl,
                Author = author,
+               BookDescription = description,
                CopiesAvailable = numberOfCopies
           };
 
           _context.Books.Add(newBook);
           _context.SaveChanges();
 
-          _logger.LogInformation("Admin added the new book succesfully");
+          _logger.LogInformation("Admin added the new book successfully");
           return Ok("Book added successfully.");
      }
 
@@ -50,7 +55,7 @@ public class AdminBooksController : ControllerBase
      [Authorize(Roles = "Admin")]
      public ActionResult RemoveBook(int bookId)
      {
-          var book = _context.Books.FirstOrDefault(b => b.BookId == bookId);
+          var book = _context.Books.FirstOrDefault(books => books.BookId == bookId);
           if (book == null)
           {
 
@@ -59,7 +64,7 @@ public class AdminBooksController : ControllerBase
           }
           _context.Books.Remove(book);
           _context.SaveChanges();
-          _logger.LogInformation("Admin removed the " + book.Title + "book succesfully");
+          _logger.LogInformation("Admin removed the " + book.Title + "book successfully");
           return Ok("Book removed successfully.");
      }
 
@@ -68,7 +73,7 @@ public class AdminBooksController : ControllerBase
      [Authorize(Roles = "Admin")]
      public ActionResult IncreaseBookCopies(int bookId, int count)
      {
-          var book = _context.Books.FirstOrDefault(b => b.BookId == bookId);
+          var book = _context.Books.FirstOrDefault(books => books.BookId == bookId);
           if (book == null)
           {
 
@@ -77,7 +82,48 @@ public class AdminBooksController : ControllerBase
           }
           book.CopiesAvailable += count;
           _context.SaveChanges();
-          _logger.LogInformation("Admin added the " + book.Title + "count succesfully");
+          _logger.LogInformation("Admin added the " + book.Title + "count successfully");
           return Ok("Book copies increased successfully.");
      }
+
+
+     //Method to get all the rental details - Admin
+     [HttpGet("rentalDetails")]
+     [Authorize(Roles = "Admin")]
+     public ActionResult<IEnumerable<RentalDetailsDto>> GetRentalDetails()
+     {
+          try
+          {
+               var rentalDetails = _context.BorrowDetails
+                                           .Include(borrowdetails => borrowdetails.User)
+                                           .Include(borrowdetails => borrowdetails.Book)
+                                           .Select(borrowdetails => new RentalDetailsDto
+                                           {
+                                                BorrowId = borrowdetails.BorrowId,
+                                                BookId = borrowdetails.BookId,
+                                                Title = borrowdetails.Book.Title,
+                                                UserId = borrowdetails.UserId,
+                                                Username = borrowdetails.User.Username,
+                                                Payment = borrowdetails.Payment
+                                           })
+                                           .ToList();
+
+               if (!rentalDetails.Any())
+               {
+
+                    _logger.LogError("Error retrieving rental details: No rental details found"); ;
+                    return NotFound("No rental details found.");
+               }
+
+               _logger.LogInformation("Successfully retrieved rental details");
+               return Ok(rentalDetails);
+          }
+          catch (Exception exception)
+          {
+
+               _logger.LogError("Error retrieving rental details: " + exception.Message);
+               return StatusCode(500, "Internal server error: " + exception.Message);
+          }
+     }
+
 }

@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "D:\\Dotnet\\LMSAPI\\LMSAPI.csproj": {}
+    "d:\\Dotnet\\LMSAPI\\LMSAPI.csproj": {}
   },
   "projects": {
-    "D:\\Dotnet\\LMSAPI\\LMSAPI.csproj": {
+    "d:\\Dotnet\\LMSAPI\\LMSAPI.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Dotnet\\LMSAPI\\LMSAPI.csproj",
+        "projectUniqueName": "d:\\Dotnet\\LMSAPI\\LMSAPI.csproj",
         "projectName": "LMSAPI",
-        "projectPath": "D:\\Dotnet\\LMSAPI\\LMSAPI.csproj",
+        "projectPath": "d:\\Dotnet\\LMSAPI\\LMSAPI.csproj",
         "packagesPath": "C:\\Users\\aashin.siby\\.nuget\\packages\\",
-        "outputPath": "D:\\Dotnet\\LMSAPI\\obj\\",
+        "outputPath": "d:\\Dotnet\\LMSAPI\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\aashin.siby\\AppData\\Roaming\\NuGet\\NuGet.Config"

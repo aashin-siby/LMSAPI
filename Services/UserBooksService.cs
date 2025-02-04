@@ -23,12 +23,14 @@ public class UserBooksService
      public IEnumerable<BookDto> GetAllBooks()
      {
           var books = _bookRepository.GetAllBooks();
-          return books.Select(b => new BookDto
+          return books.Select(books => new BookDto
           {
-               BookId = b.BookId,
-               Title = b.Title,
-               Author = b.Author,
-               CopiesAvailable = b.CopiesAvailable
+               BookId = books.BookId,
+               Title = books.Title,
+               Author = books.Author,
+               ImageUrl = books.ImageUrl,
+               BookDescription = books.BookDescription,
+               CopiesAvailable = books.CopiesAvailable
           });
      }
 

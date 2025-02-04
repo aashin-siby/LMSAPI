@@ -6,12 +6,17 @@ namespace LMSAPI.Models;
 //Class which define the Book object
 public class Book
 {
-     
+
      [Key]
      public int BookId { get; set; }
 
      [Required]
      public string? Title { get; set; }
+
+     
+     public string? ImageUrl { get; set; }
+
+     public string? BookDescription { get; set; }
 
      [Required]
      [RegularExpression(ModelConstants.AuthorPattern, ErrorMessage = ModelConstants.AuthorErrorMessage)]

@@ -14,7 +14,7 @@ public class BookRepository : IBookRepository
           _dbContext = dbContext;
      }
 
-     /// Retrieves all books from the database.
+     // Retrieves all books from the database.
      public IEnumerable<Book> GetAllBooks()
      {
 

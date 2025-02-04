@@ -26,7 +26,7 @@ public class UserBooksController : ControllerBase
      {
 
           var books = _userBooksService.GetAllBooks();
-          _logger.LogInformation("Succesfully loaded the Books");
+          _logger.LogInformation("Successfully loaded the Books");
           return Ok(books);
      }
 
@@ -42,7 +42,7 @@ public class UserBooksController : ControllerBase
                return BadRequest(ModelState);
           }
 
-          var userId = User.Claims.FirstOrDefault(c => c.Type == "userId")?.Value;
+          var userId = User.Claims.FirstOrDefault(claim => claim.Type == "userId")?.Value;
           if (userId == null)
           {
 
@@ -78,7 +78,7 @@ public class UserBooksController : ControllerBase
                _logger.LogError("Model binding of returnBookDto not successful");
                return BadRequest(ModelState);
           }
-          var userId = User.Claims.FirstOrDefault(c => c.Type == "userId")?.Value;
+          var userId = User.Claims.FirstOrDefault(claim => claim.Type == "userId")?.Value;
           if (userId == null)
           {
 
@@ -108,11 +108,11 @@ public class UserBooksController : ControllerBase
      public IActionResult GetUserRentals()
      {
 
-          var userId = User.Claims.FirstOrDefault(c => c.Type == "userId")?.Value;
+          var userId = User.Claims.FirstOrDefault(claim => claim.Type == "userId")?.Value;
           if (string.IsNullOrEmpty(userId))
           {
 
-               _logger.LogError("User not found to retrive his/her rental details");
+               _logger.LogError("User not found to retrieve his/her rental details");
                return Unauthorized("User ID not found in claims.");
           }
 
