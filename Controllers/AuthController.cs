@@ -77,9 +77,7 @@ public class AuthController : ControllerBase
         {
 
             _logger.LogInformation("Login attempt for username: {Username}", request.Username);
-            var user = _context.Users.FirstOrDefault(u =>
-                EF.Functions.Collate(u.Username, "SQL_Latin1_General_CP1_CS_AS") == request.Username);
-
+            var user = _context.Users.AsEnumerable().FirstOrDefault(u => string.Equals(u.Username, request.Username, StringComparison.OrdinalIgnoreCase));
             if (user == null)
             {
 
