@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 
 namespace LMSAPI.Models;
+
 //Model to store the the Borrow Date, Return Date and Payment amount 
 public class BorrowDetails
 {

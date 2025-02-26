@@ -2,6 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using LMSAPI.Utilities;
 
 namespace LMSAPI.DTO;
+
 //Book Dto to get all the boos details to display it 
 public class BookDto
 {
@@ -18,6 +19,6 @@ public class BookDto
 
      public string? BookDescription { get; set; }
      [Required]
-     [RegularExpression(ModelConstants.CopiesAvailablePatter, ErrorMessage = ModelConstants.CopiesAvailableErrorMessage)]
+     [RegularExpression(ModelConstants.CopiesAvailablePattern, ErrorMessage = ModelConstants.CopiesAvailableErrorMessage)]
      public int CopiesAvailable { get; set; }
 }

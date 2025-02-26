@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 
 namespace LMSAPI.DTO;
+
 //Dto when returning the book
 public class ReturnBookDto
 {

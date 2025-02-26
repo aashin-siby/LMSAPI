@@ -5,34 +5,35 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace LMSAPI.Controllers;
 
-//Controller which handle all the library methods that can be done by and for User
+//Controller which handle all the library methods for User
+[Authorize]
 [Route("api/[controller]")]
 [ApiController]
 public class UserBooksController : ControllerBase
 {
 
-     private readonly UserBooksService _userBooksService;
+     private readonly IUserBooksService _userBooksService;
      private readonly ILogger<UserBooksController> _logger;
-     public UserBooksController(UserBooksService userBooksService, ILogger<UserBooksController> logger)
+     public UserBooksController(IUserBooksService userBooksService, ILogger<UserBooksController> logger)
      {
 
           _userBooksService = userBooksService;
           _logger = logger;
      }
 
-     //Method to get all the books 
+     // Get all books
      [HttpGet("books")]
+     [AllowAnonymous]
      public IActionResult GetAllBooks()
      {
 
           var books = _userBooksService.GetAllBooks();
-          _logger.LogInformation("Successfully loaded the Books");
+          _logger.LogInformation($"Fetched {books.Count()} books from the database.");
           return Ok(books);
      }
 
-     //Method to borrow the particular book
+     // Borrow book
      [HttpPost("borrow")]
-     [Authorize]
      public IActionResult BorrowBook([FromBody] BorrowBookDto borrowBookDto)
      {
           if (!ModelState.IsValid)
@@ -54,57 +55,67 @@ public class UserBooksController : ControllerBase
           try
           {
 
-               _logger.LogInformation("Book borrowed successfully by" + borrowBookDto.UserId);
+               _logger.LogInformation($"Book borrowed successfully by user {borrowBookDto.UserId}");
                _userBooksService.BorrowBook(borrowBookDto);
                return Ok("Book borrowed successfully");
           }
+          catch (ArgumentException argumentException)
+          {
+               _logger.LogError(argumentException, "Invalid data provided.");
+               return BadRequest("Invalid request data.");
+          }
+          catch (InvalidOperationException invalidOperationException)
+          {
+               _logger.LogError(invalidOperationException, "Operation failed due to business logic constraints.");
+               return BadRequest(invalidOperationException.Message);
+          }
           catch (Exception exception)
           {
-
-               _logger.LogError(exception, "Error occurred while borrowing book.");
-               return BadRequest("An error occurred while borrowing the book. Please try again later.");
+               _logger.LogError(exception, "Unexpected error occurred.");
+               return StatusCode(500, "An internal error occurred. Please try again later.");
           }
      }
 
-     //Method to return the book which is borrowed
+     // Return book
+     // Return book
      [HttpPost("return")]
-     [Authorize]
      public IActionResult ReturnBook([FromBody] ReturnBookDto returnBookDto)
      {
-
           if (!ModelState.IsValid)
           {
-
-               _logger.LogError("Model binding of returnBookDto not successful");
+               _logger.LogError("Invalid returnBookDto model.");
                return BadRequest(ModelState);
           }
-          var userId = User.Claims.FirstOrDefault(claim => claim.Type == "userId")?.Value;
-          if (userId == null)
-          {
 
-               _logger.LogError("User not found when trying to return Book");
-               return Unauthorized("User not found in claims.");
+          var userId = User.Claims.FirstOrDefault(c => c.Type == "userId")?.Value;
+          if (string.IsNullOrEmpty(userId) || !int.TryParse(userId, out var parsedUserId))
+          {
+               _logger.LogError("Invalid or missing userId in claims.");
+               return Unauthorized("Invalid userId.");
           }
-          returnBookDto.UserId = int.Parse(userId);
+
+          returnBookDto.UserId = parsedUserId;
+
           try
           {
-
-               _logger.LogInformation("Book returned successfully by" + returnBookDto.UserId);
                _userBooksService.ReturnBook(returnBookDto);
-               return Ok("Book returned successfully");
+               _logger.LogInformation("User {UserId} returned book {BookId}.", parsedUserId, returnBookDto.BookId);
+               return Ok("Book returned successfully.");
+          }
+          catch (InvalidOperationException invalidOperationException)
+          {
+               _logger.LogError(invalidOperationException, "Business logic error while returning book.");
+               return BadRequest(invalidOperationException.Message);
           }
           catch (Exception exception)
           {
-
-               _logger.LogError(exception, "Error occurred while returning book.");
-               return BadRequest("An error occurred while returning the book. Please try again later.");
+               _logger.LogError(exception, "Unexpected error while returning book.");
+               return StatusCode(500, "An internal error occurred.");
           }
      }
 
-     //Method to get the rental details of individual Users
+     //Method to get the rental details of Users
      [HttpGet("rentals")]
-     [Authorize]
-
      public IActionResult GetUserRentals()
      {
 
@@ -120,14 +131,14 @@ public class UserBooksController : ControllerBase
           {
 
                var rentals = _userBooksService.GetUserRentals(int.Parse(userId));
-               _logger.LogInformation("Displayed the rental details of "+ userId);
+               _logger.LogInformation($"Displayed rental details for user {userId}");
                return Ok(rentals);
           }
           catch (Exception exception)
           {
 
                _logger.LogError(exception, "Error occurred while fetching user rentals.");
-               return BadRequest("An error occurred while fetching rentals. Please try again later.");
+               return StatusCode(500, "An internal error occurred while fetching rentals.");
           }
      }
 

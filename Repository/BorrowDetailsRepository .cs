@@ -1,4 +1,5 @@
 using LMSAPI.Data;
+using LMSAPI.DTO;
 using LMSAPI.Models;
 using LMSAPI.Repository.IRepository;
 using Microsoft.EntityFrameworkCore;
@@ -37,6 +38,17 @@ public class BorrowDetailsRepository : IBorrowDetailsRepository
                       .FirstOrDefault(borrowDetails => borrowDetails.UserId == userId && borrowDetails.BorrowId == borrowId);
     }
 
+    /// Retrieves all rentals for a specific user.
+    public IEnumerable<BorrowDetails> GetUserRentals(int userId)
+    {
+        return _context.BorrowDetails
+            .Include(borrowDetails => borrowDetails.Book)
+            .Where(borrowDetails => borrowDetails.UserId == userId)
+            .OrderByDescending(borrowDetails => borrowDetails.BorrowDate)
+            .ToList();
+    }
+
+
     /// Updates an existing borrow record in the database.
     public void UpdateBorrowDetails(BorrowDetails borrowDetails)
     {
@@ -47,5 +59,24 @@ public class BorrowDetailsRepository : IBorrowDetailsRepository
     public void Save()
     {
         _context.SaveChanges();
+    }
+
+    // Retrieves a list of rental details asynchronously.
+    public async Task<IEnumerable<RentalDetailsDto>> GetRentalDetailsAsync()
+    {
+        return await _context.BorrowDetails
+            .Include(borrowDetails => borrowDetails.User)
+            .Include(borrowDetails => borrowDetails.Book)
+            .Select(borrowDetails => new RentalDetailsDto
+            {
+                BorrowId = borrowDetails.BorrowId,
+                BookId = borrowDetails.BookId,
+                Title = borrowDetails.Book.Title,
+                UserId = borrowDetails.UserId,
+                Username = borrowDetails.User.Username,
+                ReturnDate = borrowDetails.ReturnDate,
+                Payment = borrowDetails.Payment
+            })
+            .ToListAsync();
     }
 }

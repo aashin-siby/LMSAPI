@@ -6,6 +6,7 @@ namespace LMSAPI.Data
     // Class which interact with the database using EF Core ORM
     public class LibraryDbContext : DbContext
     {
+        // Constructor for LibraryDbContext that initializes the DbContext with provided options.
         public LibraryDbContext(DbContextOptions<LibraryDbContext> options) : base(options) { }
 
         //User model to db

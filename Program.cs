@@ -16,7 +16,6 @@ using LMSAPI.Repository.IRepository;
 using LMSAPI.Repository;
 using LMSAPI.Utilities;
 using LMSAPI.Services;
-using LMSAPI.Controllers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -95,9 +94,9 @@ builder.Services.AddCors(options =>
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IBorrowDetailsRepository, BorrowDetailsRepository>();
 builder.Services.AddScoped<IBookRepository, BookRepository>();
-builder.Services.AddScoped<AdminBooksController>();
-builder.Services.AddScoped<UserBooksService>();
-builder.Services.AddScoped<IRentalRepository, RentalRepository>();
+
+builder.Services.AddScoped<IAdminBookService, AdminBookService>();
+builder.Services.AddScoped<IUserBooksService, UserBooksService>();
 
 // Registering AutoMapper with the mapping profile for DTOs and models.
 builder.Services.AddAutoMapper(typeof(MappingProfile));

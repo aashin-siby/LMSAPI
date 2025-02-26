@@ -61,7 +61,7 @@ public class AuthController : ControllerBase
 
     // Method to login an existing user
     [HttpPost("login")]
-    public IActionResult Login([FromBody] UserLogin request)
+    public async Task<IActionResult> Login([FromBody] UserLogin userLogin)
     {
 
         if (!ModelState.IsValid)
@@ -76,32 +76,34 @@ public class AuthController : ControllerBase
         try
         {
 
-            _logger.LogInformation("Login attempt for username: {Username}", request.Username);
-            var user = _context.Users.AsEnumerable().FirstOrDefault(user => string.Equals(user.Username, request.Username, StringComparison.OrdinalIgnoreCase));
+            _logger.LogInformation("Login attempt for username: {Username}", userLogin.Username);
+            var user = await _context.Users
+                    .FirstOrDefaultAsync(user => user.Username == userLogin.Username);
+
             if (user == null)
             {
 
-                _logger.LogWarning("Login failed: User not found for username: {Username}", request.Username);
+                _logger.LogWarning("Login failed: User not found for username: {Username}", userLogin.Username);
                 return Unauthorized(new { success = false, message = "Invalid username or password!" });
             }
 
-            if (!BCrypt.Net.BCrypt.Verify(request.Password, user.Password))
+            if (!BCrypt.Net.BCrypt.Verify(userLogin.Password, user.Password))
             {
 
-                _logger.LogWarning("Login failed: Invalid password for username: {Username}", request.Username);
-                return Unauthorized(new { success = false, message = "Invalid username or password!" });
+                _logger.LogWarning("Login failed: Invalid password for username: {Username}", userLogin.Username);
+                return Unauthorized(new { success = false, message = "Invalid username or userLogin!" });
             }
 
             var token = GenerateJwtToken(user);
 
-            _logger.LogInformation("Login successful for username: {Username}", request.Username);
+            _logger.LogInformation("Login successful for username: {Username}", userLogin.Username);
             var jsonResponse = new { token, success = true, role = user.Role, message = "Login successful!" };
             return Ok(jsonResponse);
         }
         catch (Exception exception)
         {
 
-            _logger.LogError(exception, "An error occurred during login for username: {Username}", request.Username);
+            _logger.LogError(exception, "An error occurred during login for username: {Username}", userLogin.Username);
             return StatusCode(500, new { success = false, message = "An error occurred while processing your request." });
         }
     }

@@ -1,10 +1,9 @@
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 using LMSAPI.Utilities;
 
 namespace LMSAPI.Models;
 
-//Class which define the Book object
+//Model which define the Book entity
 public class Book
 {
 
@@ -23,7 +22,7 @@ public class Book
      public string? Author { get; set; }
 
      [Required]
-     [RegularExpression(ModelConstants.CopiesAvailablePatter, ErrorMessage = ModelConstants.CopiesAvailableErrorMessage)]
+     [RegularExpression(ModelConstants.CopiesAvailablePattern, ErrorMessage = ModelConstants.CopiesAvailableErrorMessage)]
      public int CopiesAvailable { get; set; }
 
      public ICollection<BorrowDetails>? BorrowDetails { get; set; }

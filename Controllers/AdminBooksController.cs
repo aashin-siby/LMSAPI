@@ -1,129 +1,75 @@
-using System.ComponentModel;
-using LMSAPI.Data;
 using LMSAPI.DTO;
-using LMSAPI.Models;
+using LMSAPI.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace LMSAPI.Controllers;
 
 //Controller which handle all the library methods that can be done by and for Admin
+[Authorize(Roles = "Admin")]
 [Route("api/[controller]")]
 [ApiController]
 public class AdminBooksController : ControllerBase
 
 {
-     private readonly LibraryDbContext _context;
+     private readonly IAdminBookService _adminBookService;
      private readonly ILogger<AdminBooksController> _logger;
-     public AdminBooksController(LibraryDbContext context, ILogger<AdminBooksController> logger)
+     public AdminBooksController(IAdminBookService adminBookService, ILogger<AdminBooksController> logger)
      {
 
-          _context = context;
+          _adminBookService = adminBookService;
           _logger = logger;
+
      }
-     //Method to add New Book - Admin
-     [HttpPost("addBook/{title}/{author}/{imageUrl}/{description}/{numberOfCopies}")]
-     [Authorize(Roles = "Admin")]
-     public ActionResult AddBook(string title, string author, string imageUrl, string description, int numberOfCopies)
+
+     //POST: Method to add New Book - Admin
+     [HttpPost("addBook")]
+     public async Task<ActionResult> AddBook([FromBody] BookDto bookDto)
      {
-          if (numberOfCopies <= 0)
+          try
           {
-
-               _logger.LogError("Enter a number greater than 0");
-               return BadRequest("Number of copies must be greater than zero.");
+               await _adminBookService.AddBookAsync(bookDto);
+               return Ok("Book added successfully.");
           }
-          var newBook = new Book
+          catch (ArgumentException argumentException)
           {
-
-               Title = title,
-               ImageUrl = imageUrl,
-               Author = author,
-               BookDescription = description,
-               CopiesAvailable = numberOfCopies
-          };
-
-          _context.Books.Add(newBook);
-          _context.SaveChanges();
-
-          _logger.LogInformation("Admin added the new book successfully");
-          return Ok("Book added successfully.");
+               _logger.LogError(argumentException.Message);
+               return BadRequest(argumentException.Message);
+          }
      }
 
      //Method to remove a Book - Admin 
      [HttpDelete("removeBook/{bookId}")]
-     [Authorize(Roles = "Admin")]
-     public ActionResult RemoveBook(int bookId)
+     public async Task<ActionResult> RemoveBook(int bookId)
      {
-          var book = _context.Books.FirstOrDefault(books => books.BookId == bookId);
-          if (book == null)
-          {
-
-               _logger.LogError("Book with bookId " + bookId + " not found");
+          var result = await _adminBookService.RemoveBookAsync(bookId);
+          if (!result)
                return NotFound("Book not found.");
-          }
-          _context.Books.Remove(book);
-          _context.SaveChanges();
-          _logger.LogInformation("Admin removed the " + book.Title + "book successfully");
+
           return Ok("Book removed successfully.");
      }
 
      //Method to increase the book copies - Admin
      [HttpPost("increaseBookCopies/{bookId}/{count}")]
-     [Authorize(Roles = "Admin")]
-     public ActionResult IncreaseBookCopies(int bookId, int count)
+     public async Task<ActionResult> IncreaseBookCopies(int bookId, int count)
      {
-          var book = _context.Books.FirstOrDefault(books => books.BookId == bookId);
-          if (book == null)
-          {
-
-               _logger.LogError("Book with bookId " + bookId + " not found");
+          var result = await _adminBookService.IncreaseBookCopiesAsync(bookId, count);
+          if (!result)
                return NotFound("Book not found.");
-          }
-          book.CopiesAvailable += count;
-          _context.SaveChanges();
-          _logger.LogInformation("Admin added the " + book.Title + "count successfully");
+
           return Ok("Book copies increased successfully.");
      }
 
 
      //Method to get all the rental details - Admin
      [HttpGet("rentalDetails")]
-     [Authorize(Roles = "Admin")]
-     public ActionResult<IEnumerable<RentalDetailsDto>> GetRentalDetails()
+     public async Task<ActionResult<IEnumerable<RentalDetailsDto>>> GetRentalDetails()
      {
-          try
-          {
-               var rentalDetails = _context.BorrowDetails
-                                           .Include(borrowDetails => borrowDetails.User)
-                                           .Include(borrowDetails => borrowDetails.Book)
-                                           .Select(borrowDetails => new RentalDetailsDto
-                                           {
-                                                BorrowId = borrowDetails.BorrowId,
-                                                BookId = borrowDetails.BookId,
-                                                Title = borrowDetails.Book.Title,
-                                                UserId = borrowDetails.UserId,
-                                                Username = borrowDetails.User.Username,
-                                                Payment = borrowDetails.Payment
-                                           })
-                                           .ToList();
+          var rentalDetails = await _adminBookService.GetRentalDetailsAsync();
+          if (!rentalDetails.Any())
+               return NotFound("No rental details found.");
 
-               if (!rentalDetails.Any())
-               {
-
-                    _logger.LogError("Error retrieving rental details: No rental details found"); ;
-                    return NotFound("No rental details found.");
-               }
-
-               _logger.LogInformation("Successfully retrieved rental details");
-               return Ok(rentalDetails);
-          }
-          catch (Exception exception)
-          {
-
-               _logger.LogError("Error retrieving rental details: " + exception.Message);
-               return StatusCode(500, "Internal server error: " + exception.Message);
-          }
+          return Ok(rentalDetails);
      }
 
 }

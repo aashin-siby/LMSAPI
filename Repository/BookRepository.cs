@@ -42,11 +42,33 @@ public class BookRepository : IBookRepository
           _dbContext.Books.Update(book);
      }
 
-    /// Saves all changes made to the database context.
+     /// Saves all changes made to the database context.
      public void Save()
      {
           _dbContext.SaveChanges();
      }
 
+     // Admin Methods
+
+     // Adds a new book to the database
+     public async Task AddBookAsync(Book book)
+     {
+          await _dbContext.Books.AddAsync(book);
+          await _dbContext.SaveChangesAsync();
+     }
+
+     // Removes an existing book from the database
+     public async Task RemoveBookAsync(Book book)
+     {
+          _dbContext.Books.Remove(book);
+          await _dbContext.SaveChangesAsync();
+     }
+
+     // Increases the available copies of a book and updates the database 
+     public async Task IncreaseBookCopiesAsync(Book book, int count)
+     {
+          book.CopiesAvailable += count;
+          await _dbContext.SaveChangesAsync();
+     }
 
 }

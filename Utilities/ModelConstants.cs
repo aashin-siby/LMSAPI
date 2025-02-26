@@ -9,7 +9,7 @@ public static class ModelConstants
      public const string PasswordPattern = @"^[a-zA-Z0-9!@#$%^&*()_+]+$";
      public const string RolePattern = "^(Admin|User)$";
      public const string AuthorPattern = @"^[\p{L}\s]+$";
-     public const string CopiesAvailablePatter = @"^\d+$";
+     public const string CopiesAvailablePattern = @"^\d+$";
 
 
      // Error Messages for User and Book

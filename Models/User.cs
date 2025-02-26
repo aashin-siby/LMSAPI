@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using LMSAPI.Utilities;
 namespace LMSAPI.Models;
 
-//Class which defines the User
+//Model which defines the User Entity
 public class User
 {
 

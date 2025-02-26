@@ -4,18 +4,19 @@ using LMSAPI.Models;
 using LMSAPI.Repository.IRepository;
 
 namespace LMSAPI.Services;
+
 //Service for Library methods that is related to User
-public class UserBooksService
+public class UserBooksService : IUserBooksService
 {
      private readonly IBookRepository _bookRepository;
      private readonly IBorrowDetailsRepository _borrowDetailsRepository;
-     private readonly IRentalRepository _rentalRepository;
+     private readonly IMapper _mapper;
 
-     public UserBooksService(IRentalRepository rentalRepository, IBookRepository bookRepository, IBorrowDetailsRepository borrowDetailsRepository)
+     public UserBooksService(IBookRepository bookRepository, IBorrowDetailsRepository borrowDetailsRepository, IMapper mapper)
      {
           _bookRepository = bookRepository;
           _borrowDetailsRepository = borrowDetailsRepository;
-          _rentalRepository = rentalRepository;
+          _mapper = mapper;
 
      }
 
@@ -23,15 +24,8 @@ public class UserBooksService
      public IEnumerable<BookDto> GetAllBooks()
      {
           var books = _bookRepository.GetAllBooks();
-          return books.Select(books => new BookDto
-          {
-               BookId = books.BookId,
-               Title = books.Title,
-               Author = books.Author,
-               ImageUrl = books.ImageUrl,
-               BookDescription = books.BookDescription,
-               CopiesAvailable = books.CopiesAvailable
-          });
+         return _mapper.Map<IEnumerable<BookDto>>(books);
+
      }
 
      /// Allows a user to borrow a book.
@@ -46,15 +40,9 @@ public class UserBooksService
           book.CopiesAvailable -= 1;
 
           _bookRepository.UpdateBook(book);
-
-          var borrowDetails = new BorrowDetails
-          {
-               Title = bookTitle,
-               UserId = borrowBookDto.UserId,
-               BookId = borrowBookDto.BookId,
-               BorrowDate = borrowBookDto.BorrowDate,
-               Payment = 100
-          };
+          
+          var borrowDetails = _mapper.Map<BorrowDetails>(borrowBookDto);
+          borrowDetails.Title = bookTitle;
 
           _borrowDetailsRepository.AddBorrowDetails(borrowDetails);
           _borrowDetailsRepository.Save();
@@ -91,15 +79,9 @@ public class UserBooksService
      /// Retrieves all rental details for a specific user
      public IEnumerable<BorrowDetailsDto> GetUserRentals(int userId)
      {
-          var rentals = _rentalRepository.GetUserRentals(userId);
-          return rentals.Select(r => new BorrowDetailsDto
-          {
-               Title = r.Title,
-               BorrowId = r.BorrowId,
-               BookId = r.BookId,
-               BorrowDate = r.BorrowDate,
-               ReturnDate = r.ReturnDate,
-               Payment = r.Payment,
-          }).ToList();
+          var rentals = _borrowDetailsRepository.GetUserRentals(userId);
+
+          return _mapper.Map<IEnumerable<BorrowDetailsDto>>(rentals);
+         
      }
 }
