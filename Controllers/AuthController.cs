@@ -77,7 +77,7 @@ public class AuthController : ControllerBase
         {
 
             _logger.LogInformation("Login attempt for username: {Username}", request.Username);
-            var user = _context.Users.AsEnumerable().FirstOrDefault(u => string.Equals(u.Username, request.Username, StringComparison.OrdinalIgnoreCase));
+            var user = _context.Users.AsEnumerable().FirstOrDefault(user => string.Equals(user.Username, request.Username, StringComparison.OrdinalIgnoreCase));
             if (user == null)
             {
 
@@ -120,8 +120,7 @@ public class AuthController : ControllerBase
                     new Claim(JwtRegisteredClaimNames.Sub, user.Username),
                     new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                     new Claim(ClaimTypes.Role, user.Role)
-                };
-
+            };
             var token = new JwtSecurityToken(
                 issuer: _configuration["Jwt:Issuer"],
                 audience: _configuration["Jwt:Audience"],

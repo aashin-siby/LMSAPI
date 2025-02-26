@@ -18,9 +18,9 @@ namespace LMSAPI.Repository
         public IEnumerable<BorrowDetails> GetUserRentals(int userId)
         {
             return _context.BorrowDetails
-                .Include(bd => bd.Book)
-                .Where(bd => bd.UserId == userId)
-                .OrderByDescending(bd => bd.BorrowDate)
+                .Include(borrowDetails => borrowDetails.Book)
+                .Where(borrowDetails => borrowDetails.UserId == userId)
+                .OrderByDescending(borrowDetails => borrowDetails.BorrowDate)
                 .ToList();
         }
 

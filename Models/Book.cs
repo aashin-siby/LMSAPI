@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using LMSAPI.Utilities;
 
 namespace LMSAPI.Models;
@@ -13,7 +14,6 @@ public class Book
      [Required]
      public string? Title { get; set; }
 
-     
      public string? ImageUrl { get; set; }
 
      public string? BookDescription { get; set; }

@@ -13,7 +13,7 @@ public interface IBorrowDetailsRepository
      IEnumerable<BorrowDetails> GetBorrowDetailsByUserId(int userId);
 
      /// Retrieves a specific borrow record for a user based on the borrow ID.
-     BorrowDetails GetBorrowDetailsByUserIdAndBookId(int userId, int borrowId);
+     BorrowDetails GetBorrowDetailsByUserIdAndBorrowId(int userId, int borrowId);
 
      /// Updates an existing borrow record in the database.
      void UpdateBorrowDetails(BorrowDetails borrowDetails);

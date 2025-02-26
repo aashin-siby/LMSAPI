@@ -64,7 +64,7 @@ public class UserBooksService
      /// Allows a user to return a borrowed book.
      public void ReturnBook(ReturnBookDto returnBookDto)
      {
-          var borrowDetails = _borrowDetailsRepository.GetBorrowDetailsByUserIdAndBookId(returnBookDto.UserId, returnBookDto.BorrowId);
+          var borrowDetails = _borrowDetailsRepository.GetBorrowDetailsByUserIdAndBorrowId(returnBookDto.UserId, returnBookDto.BorrowId);
           if (borrowDetails == null || borrowDetails.ReturnDate != null)
                throw new Exception("Borrow details not found or book already returned");
 

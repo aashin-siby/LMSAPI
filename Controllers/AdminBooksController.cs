@@ -95,16 +95,16 @@ public class AdminBooksController : ControllerBase
           try
           {
                var rentalDetails = _context.BorrowDetails
-                                           .Include(borrowdetails => borrowdetails.User)
-                                           .Include(borrowdetails => borrowdetails.Book)
-                                           .Select(borrowdetails => new RentalDetailsDto
+                                           .Include(borrowDetails => borrowDetails.User)
+                                           .Include(borrowDetails => borrowDetails.Book)
+                                           .Select(borrowDetails => new RentalDetailsDto
                                            {
-                                                BorrowId = borrowdetails.BorrowId,
-                                                BookId = borrowdetails.BookId,
-                                                Title = borrowdetails.Book.Title,
-                                                UserId = borrowdetails.UserId,
-                                                Username = borrowdetails.User.Username,
-                                                Payment = borrowdetails.Payment
+                                                BorrowId = borrowDetails.BorrowId,
+                                                BookId = borrowDetails.BookId,
+                                                Title = borrowDetails.Book.Title,
+                                                UserId = borrowDetails.UserId,
+                                                Username = borrowDetails.User.Username,
+                                                Payment = borrowDetails.Payment
                                            })
                                            .ToList();
 

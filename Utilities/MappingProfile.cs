@@ -20,14 +20,14 @@ public class MappingProfile : Profile
         CreateMap<BorrowDetails, BorrowBookDto>().ReverseMap();
         CreateMap<BorrowDetails, ReturnBookDto>().ReverseMap();
         CreateMap<BorrowDetails, BorrowDetailsDto>()
-            .ForMember(dest => dest.Title, opt => opt.MapFrom(src => src.Book.Title))
-            .ForMember(dest => dest.Payment, opt => opt.MapFrom(src => src.Payment))
-            .ForMember(dest => dest.BorrowId, opt => opt.MapFrom(src => src.BorrowId))
-            .ForMember(dest => dest.BorrowDate, opt => opt.MapFrom(src =>
-                src.BorrowDate == DateTime.MinValue ? DateTime.UtcNow : src.BorrowDate))
-            .ForMember(dest => dest.ReturnDate, opt => opt.MapFrom(src =>
-                src.ReturnDate.HasValue && src.ReturnDate.Value == DateTime.MinValue
+            .ForMember(borrowDetailsDto => borrowDetailsDto.Title, option => option.MapFrom(borrowDetails => borrowDetails.Book.Title))
+            .ForMember(borrowDetailsDto => borrowDetailsDto.Payment, option => option.MapFrom(borrowDetails => borrowDetails.Payment))
+            .ForMember(borrowDetailsDto => borrowDetailsDto.BorrowId, option => option.MapFrom(borrowDetails => borrowDetails.BorrowId))
+            .ForMember(borrowDetailsDto => borrowDetailsDto.BorrowDate, option => option.MapFrom(borrowDetails =>
+                borrowDetails.BorrowDate == DateTime.MinValue ? DateTime.UtcNow : borrowDetails.BorrowDate))
+            .ForMember(borrowDetailsDto => borrowDetailsDto.ReturnDate, opt => opt.MapFrom(borrowDetails =>
+                borrowDetails.ReturnDate.HasValue && borrowDetails.ReturnDate.Value == DateTime.MinValue
                     ? (DateTime?)null
-                    : src.ReturnDate));
+                    : borrowDetails.ReturnDate));
     }
 }

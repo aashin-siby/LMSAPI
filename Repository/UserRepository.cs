@@ -17,7 +17,7 @@ public class UserRepository : IUserRepository
     /// Retrieves a user by their username
     public async Task<User> GetUserByUsernameAsync(string username)
     {
-        return await _context.Users.SingleOrDefaultAsync(u => u.Username == username);
+        return await _context.Users.SingleOrDefaultAsync(user => user.Username == username);
     }
 
     /// Adds a new user to the database
@@ -26,4 +26,5 @@ public class UserRepository : IUserRepository
         await _context.Users.AddAsync(user);
         await _context.SaveChangesAsync();
     }
+
 }

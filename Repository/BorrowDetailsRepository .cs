@@ -24,17 +24,17 @@ public class BorrowDetailsRepository : IBorrowDetailsRepository
     public IEnumerable<BorrowDetails> GetBorrowDetailsByUserId(int userId)
     {
         return _context.BorrowDetails
-                       .Include(b => b.Book)
-                       .Where(b => b.UserId == userId)
+                       .Include(borrowDetails => borrowDetails.Book)
+                       .Where(borrowDetails => borrowDetails.UserId == userId)
                        .ToList();
     }
 
     /// Retrieves a specific borrow record for a user based on borrow ID.
-    public BorrowDetails GetBorrowDetailsByUserIdAndBookId(int userId, int borrowId)
+    public BorrowDetails GetBorrowDetailsByUserIdAndBorrowId(int userId, int borrowId)
     {
         return _context.BorrowDetails
-                      .Include(b => b.Book)
-                      .FirstOrDefault(b => b.UserId == userId && b.BorrowId == borrowId);
+                      .Include(borrowDetails => borrowDetails.Book)
+                      .FirstOrDefault(borrowDetails => borrowDetails.UserId == userId && borrowDetails.BorrowId == borrowId);
     }
 
     /// Updates an existing borrow record in the database.
