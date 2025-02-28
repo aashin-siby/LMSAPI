@@ -4,7 +4,7 @@ using LMSAPI.Utilities;
 namespace LMSAPI.DTO;
 
 //Dto to map when user register with User model
-public class UserRegister
+public class UserRegisterDto
 {
     
     [Required]

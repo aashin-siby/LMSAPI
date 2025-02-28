@@ -34,7 +34,7 @@ public class AuthController : ControllerBase
 
     // Method to register a new user
     [HttpPost("register")]
-    public async Task<IActionResult> Register([FromBody] UserRegister userRegister)
+    public async Task<IActionResult> Register([FromBody] UserRegisterDto userRegister)
     {
         try
         {
@@ -61,7 +61,7 @@ public class AuthController : ControllerBase
 
     // Method to login an existing user
     [HttpPost("login")]
-    public async Task<IActionResult> Login([FromBody] UserLogin userLogin)
+    public async Task<IActionResult> Login([FromBody] UserLoginDto userLogin)
     {
 
         if (!ModelState.IsValid)

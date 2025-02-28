@@ -10,8 +10,8 @@ public class MappingProfile : Profile
     public MappingProfile()
     {
         // User mappings
-        CreateMap<User, UserRegister>().ReverseMap();
-        CreateMap<User, UserLogin>().ReverseMap();
+        CreateMap<User, UserRegisterDto>().ReverseMap();
+        CreateMap<User, UserLoginDto>().ReverseMap();
 
         // Book mappings
         CreateMap<Book, BookDto>().ReverseMap();
